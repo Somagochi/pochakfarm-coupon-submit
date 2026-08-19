@@ -1,5 +1,5 @@
 const STORAGE_KEY = "pochakfarm_coupon_session";
-const API_BASE_URL = "http://13.209.190.156";
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 const state = {
   user: JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"),
   submitting: false,
@@ -50,6 +50,10 @@ function renderHeader() {
 }
 
 function startOAuthLogin(provider) {
+  if (!API_BASE_URL) {
+    showToast("API 서버 주소가 설정되지 않았습니다.");
+    return;
+  }
   window.location.assign(`${API_BASE_URL}/api/auth/oauth2/${provider}`);
 }
 

@@ -4,13 +4,22 @@
 
 ## 실행
 
-별도 의존성 없이 정적 파일로 동작합니다.
+Node.js 환경에서 의존성을 설치합니다.
 
 ```bash
-python3 -m http.server 4173
+npm install
+npm run dev
 ```
 
 브라우저에서 `http://localhost:4173/coupon` 또는 `http://localhost:4173`을 엽니다.
+
+`.env.example`을 `.env.local`로 복사한 뒤 환경에 맞는 API 주소를 입력합니다.
+
+```env
+VITE_API_BASE_URL=http://13.209.190.156
+```
+
+Vercel 프로젝트에서는 Settings → Environment Variables에 `VITE_API_BASE_URL`을 등록한 뒤 다시 배포해야 합니다. 이 값은 브라우저 번들에 포함되는 공개 API 주소이므로 비밀 키를 넣으면 안 됩니다.
 
 ## 데모 코드
 
@@ -35,8 +44,8 @@ python3 -m http.server 4173
 카카오·네이버 로그인 버튼은 OAuth 상태와 토큰 교환을 백엔드가 관리하도록 다음 로그인 시작 API로 이동합니다.
 
 ```text
-GET http://13.209.190.156/api/auth/oauth2/kakao
-GET http://13.209.190.156/api/auth/oauth2/naver
+GET {VITE_API_BASE_URL}/api/auth/oauth2/kakao
+GET {VITE_API_BASE_URL}/api/auth/oauth2/naver
 ```
 
 Apple 로그인은 관련 백엔드 OAuth 설정이 제공되기 전까지 데모로 동작합니다. OAuth 콜백 성공 후에는 백엔드가 HttpOnly 세션 쿠키를 설정하고 쿠폰 페이지로 복귀시키는 구성을 권장합니다.
