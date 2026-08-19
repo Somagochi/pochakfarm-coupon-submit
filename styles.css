@@ -51,14 +51,10 @@ button { cursor: pointer; }
 
 .brand { color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 10px; }
 .brand-mark {
-  width: 46px; height: 46px; display: grid; place-items: center; position: relative;
-  background: #78c755; border: 3px solid #3d7b32; border-radius: 12px 12px 16px 16px;
-  box-shadow: inset -4px -4px 0 rgba(41,102,30,.2), 0 3px 0 #d9b76c;
+  width: 46px; height: 46px; display: block; object-fit: cover;
+  border: 2px solid rgba(49, 109, 169, .6); border-radius: 12px;
+  box-shadow: 0 3px 0 #8dbedf, 0 4px 8px rgba(42, 105, 164, .2);
 }
-.brand-mark::before, .brand-mark::after { content: ""; position: absolute; top: -8px; width: 15px; height: 13px; background: #4b9b3e; border: 3px solid #3d7b32; }
-.brand-mark::before { left: 5px; transform: rotate(-25deg); border-radius: 10px 2px; }
-.brand-mark::after { right: 5px; transform: rotate(25deg); border-radius: 2px 10px; }
-.brand-mark span { color: #ffe267; font-size: 25px; line-height: 1; text-shadow: 2px 2px #e89925; }
 .brand-copy { display: grid; line-height: 1; }
 .brand-copy strong { font-family: "Jua", sans-serif; color: #438e34; font-size: 27px; letter-spacing: -1px; }
 .brand-copy small { font-size: 8px; font-weight: 800; letter-spacing: 2.1px; color: #967345; margin-top: 4px; }
