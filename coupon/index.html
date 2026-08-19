@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#78c95b" />
+    <meta name="description" content="포착팜 쿠폰을 등록하고 농장 보상을 받아보세요." />
+    <title>포착팜 | 쿠폰 등록</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="topbar" aria-label="포착팜 헤더">
+        <a class="brand" href="/coupon" aria-label="포착팜 쿠폰 홈">
+          <span class="brand-mark" aria-hidden="true"><span>●</span></span>
+          <span class="brand-copy"><strong>포착팜</strong><small>POCHAK FARM</small></span>
+        </a>
+        <div id="account-area"></div>
+      </header>
+      <section class="hero" aria-live="polite">
+        <div class="eyebrow"><span>✦</span> SPECIAL COUPON <span>✦</span></div>
+        <h1>포착팜 쿠폰 등록</h1>
+        <p>쿠폰을 등록하고<br class="mobile-only" /> 특별한 농장 보상을 받아보세요!</p>
+        <div id="app-card" class="game-card"></div>
+        <p class="help-text"><span aria-hidden="true">🌱</span> 쿠폰은 계정당 1회만 사용할 수 있어요.</p>
+      </section>
+    </main>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
