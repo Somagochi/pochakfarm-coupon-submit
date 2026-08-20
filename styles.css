@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "MBC 1961굴림";
+  src: url("/fonts/MBC1961Gulim-M.ttf") format("truetype"), local("MBC 1961굴림"), local("MBC1961Gulim"), local("MBC 1961 Gulim");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --cream: #fff9e7;
   --paper: #fffdf3;
@@ -9,9 +17,10 @@
   --line: #9b6a35;
   --orange: #f7a52e;
   --red: #db5c4f;
-  font-family: "Noto Sans KR", system-ui, sans-serif;
+  font-family: "MBC 1961굴림", sans-serif;
   color: var(--ink);
-  background: #8fd05e;
+  background: #35b9df url("/assets/page-background.png") center/cover fixed no-repeat;
+  overscroll-behavior-y: none;
 }
 
 * { box-sizing: border-box; }
@@ -21,15 +30,12 @@ body {
   min-width: 320px;
   min-height: 100vh;
   min-height: 100svh;
-  background: linear-gradient(rgba(27, 103, 213, .06), rgba(40, 197, 225, .08)), url("assets/pochakfarm-cover.png") center/cover fixed;
+  background: transparent url("/assets/page-background.png") center/cover fixed no-repeat;
+  overscroll-behavior-y: none;
 }
 
 body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(25,91,196,.08), transparent 38%, rgba(15,114,177,.12));
+  content: none;
 }
 
 button, input { font: inherit; }
@@ -38,7 +44,7 @@ button { cursor: pointer; }
 .page-shell { position: relative; z-index: 1; min-height: 100svh; }
 
 .topbar {
-  height: 82px;
+  height: 64px;
   padding: 0 clamp(18px, 5vw, 64px);
   display: flex;
   align-items: center;
@@ -51,12 +57,12 @@ button { cursor: pointer; }
 
 .brand { color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 10px; }
 .brand-mark {
-  width: 46px; height: 46px; display: block; object-fit: cover;
+  width: 38px; height: 38px; display: block; object-fit: cover;
   border: 2px solid rgba(49, 109, 169, .6); border-radius: 12px;
   box-shadow: 0 3px 0 #8dbedf, 0 4px 8px rgba(42, 105, 164, .2);
 }
 .brand-copy { display: grid; line-height: 1; }
-.brand-copy strong { font-family: "Jua", sans-serif; color: #438e34; font-size: 27px; letter-spacing: -1px; }
+.brand-copy strong { font-family: inherit; color: #438e34; font-size: 23px; letter-spacing: -1px; }
 .brand-copy small { font-size: 8px; font-weight: 800; letter-spacing: 2.1px; color: #967345; margin-top: 4px; }
 
 .account-pill { display: flex; align-items: center; gap: 9px; color: #42602f; font-weight: 700; font-size: 13px; }
@@ -66,42 +72,31 @@ button { cursor: pointer; }
 .hero { width: min(100% - 32px, 510px); margin: 0 auto; padding: clamp(48px, 9vh, 86px) 0 36px; text-align: center; }
 .eyebrow { display: flex; align-items: center; justify-content: center; gap: 9px; color: #417f39; font-size: 11px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 1px #fff; }
 .eyebrow span { color: #ffd554; -webkit-text-stroke: 1px #a66d20; font-size: 15px; }
-h1 { font-family: "Jua", sans-serif; font-size: clamp(38px, 9vw, 54px); margin: 9px 0 7px; letter-spacing: -2px; color: #fffbed; -webkit-text-stroke: 2px #4b7838; paint-order: stroke fill; text-shadow: 0 4px 0 #315f2a, 0 7px 0 rgba(43,79,27,.2); }
+h1 { font-family: inherit; font-size: clamp(34px, 8vw, 48px); margin: 9px 0 7px; letter-spacing: -2px; color: #fffbed; -webkit-text-stroke: 2px #4b7838; paint-order: stroke fill; text-shadow: 0 4px 0 #315f2a, 0 7px 0 rgba(43,79,27,.2); }
 .hero > p { margin: 0; font-weight: 700; font-size: 15px; line-height: 1.65; color: #38512e; text-shadow: 0 1px 0 rgba(255,255,255,.8); }
 
 .game-card {
-  margin-top: 25px;
-  padding: 8px;
-  border-radius: 24px;
-  background: #f6d691;
-  border: 3px solid #845427;
-  box-shadow: inset 0 0 0 3px #fff1bc, 0 8px 0 #5d7337, 0 14px 26px rgba(52, 73, 28, .28);
+  width: min(100%, 430px);
+  aspect-ratio: 1440 / 2357;
+  margin: 25px auto 0;
+  padding: 12% 7% 5%;
+  background: url("/assets/bottom-sheet.png") center/100% 100% no-repeat;
 }
-.card-inner { min-height: 292px; padding: 27px 27px 25px; background: var(--paper); border: 2px dashed #d5ae69; border-radius: 16px; position: relative; overflow: hidden; }
-.card-inner::before, .card-inner::after { content: "✦"; position: absolute; color: #efd493; font-size: 20px; }
-.card-inner::before { top: 13px; left: 15px; }
-.card-inner::after { bottom: 13px; right: 15px; }
+.card-inner { height: 100%; padding: 20px 16px; background: transparent; border: 0; border-radius: 0; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+.card-inner::before, .card-inner::after { content: none; }
 .card-icon { width: 66px; height: 66px; margin: 0 auto 12px; display: grid; place-items: center; font-size: 37px; background: #eaf7ce; border: 3px solid #80a853; border-radius: 18px; box-shadow: inset -5px -5px rgba(84,145,57,.13), 0 4px #ceb86d; }
-.card-title { font-family: "Jua", sans-serif; font-size: 27px; margin: 0 0 7px; color: #4b3722; }
+.card-icon.login-logo { overflow: hidden; padding: 0; background: transparent; border-color: #fff; }
+.card-icon.login-logo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.card-title { font-family: inherit; font-size: 27px; margin: 0 0 7px; color: #4b3722; }
 .card-copy { margin: 0 auto 21px; color: var(--muted); font-size: 13px; line-height: 1.65; }
 
 .social-button, .primary-button, .secondary-button { width: 100%; min-height: 54px; border-radius: 13px; font-weight: 800; border: 0; transition: transform .15s, filter .15s; }
 .social-button:hover, .primary-button:hover, .secondary-button:hover { filter: brightness(1.04); transform: translateY(-1px); }
 .social-button:active, .primary-button:active, .secondary-button:active { transform: translateY(3px); box-shadow: none; }
 .social-buttons { display: grid; gap: 11px; }
-.social-button { display: flex; justify-content: center; align-items: center; gap: 10px; position: relative; }
-.social-button.kakao { background: #fee500; color: #302519; border: 2px solid #c58e27; box-shadow: 0 5px 0 #aa7227; }
-.social-button.naver { background: #03c75a; color: #fff; border: 2px solid #078d48; box-shadow: 0 5px 0 #08753e; }
-.social-button.apple { background: #171717; color: #fff; border: 2px solid #000; box-shadow: 0 5px 0 #76654d; }
-.social-icon { position: absolute; left: 18px; width: 25px; height: 25px; display: grid; place-items: center; font-weight: 900; }
-.kakao-icon { color: #3c281e; font-size: 15px; border: 2px solid #3c281e; border-radius: 50%; line-height: 1; }
-.kakao-icon::after { content: ""; position: absolute; bottom: -3px; left: 2px; width: 6px; height: 6px; background: #3c281e; transform: rotate(35deg); }
-.naver-icon { font-family: Arial, sans-serif; font-size: 20px; }
-.apple-icon { color: #fff; font-size: 23px; }
-.apple-icon::before { content: ""; position: absolute; width: 13px; height: 16px; background: #fff; border-radius: 50% 50% 45% 45%; }
-.apple-icon::after { content: ""; position: absolute; width: 7px; height: 4px; background: #fff; border-radius: 100% 0; transform: translate(4px, -11px) rotate(-35deg); }
-.login-note { margin-top: 15px; font-size: 11px; color: #9c8972; }
-
+.social-button { display: block; width: min(100%, 300px); min-height: 0; margin: 0 auto; padding: 0; overflow: hidden; background: transparent; }
+.social-button img { display: block; width: 100%; height: auto; }
+.social-button:focus-visible { outline: 4px solid rgba(73, 54, 34, .45); outline-offset: 3px; }
 .coupon-label { display: block; text-align: left; font-size: 12px; font-weight: 900; color: #6b583e; margin-bottom: 7px; }
 .coupon-input { width: 100%; height: 55px; border-radius: 12px; border: 3px solid #d9bf8c; background: #fff; color: #3f3529; padding: 0 15px; text-align: center; font-weight: 800; font-size: 16px; letter-spacing: 1px; outline: none; text-transform: uppercase; box-shadow: inset 0 3px rgba(121,89,44,.06); }
 .coupon-input::placeholder { letter-spacing: 0; font-weight: 600; color: #baa98e; text-transform: none; }
@@ -131,14 +126,13 @@ h1 { font-family: "Jua", sans-serif; font-size: clamp(38px, 9vw, 54px); margin: 
 
 @media (max-width: 560px) {
   body { background-position: center center; }
-  .topbar { height: 68px; padding: 0 15px; border-bottom-width: 3px; }
-  .brand-mark { width: 39px; height: 39px; border-radius: 10px; }
-  .brand-copy strong { font-size: 23px; }
+  .topbar { height: 54px; padding: 0 13px; border-bottom-width: 3px; }
+  .brand-mark { width: 32px; height: 32px; border-radius: 9px; }
+  .brand-copy strong { font-size: 20px; }
   .account-pill .name { display: none; }
   .hero { padding-top: 35px; }
   .mobile-only { display: initial; }
-  .game-card { border-radius: 21px; }
-  .card-inner { padding: 24px 19px 22px; border-radius: 14px; }
+  .card-inner { padding: 16px 10px 12px; }
   h1 { -webkit-text-stroke-width: 1.5px; }
 }
 

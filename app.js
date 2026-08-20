@@ -82,15 +82,14 @@ function logout() {
 
 function loginView() {
   return `<div class="card-inner">
-    <div class="card-icon" aria-hidden="true">🎟️</div>
+    <div class="card-icon login-logo" aria-hidden="true"><img src="/assets/pochakfarm-logo.png" alt="" /></div>
     <h2 class="card-title">먼저 로그인해주세요!</h2>
     <p class="card-copy">쿠폰 보상을 받을<br />포착팜 계정으로 로그인해주세요.</p>
     <div class="social-buttons" aria-label="소셜 로그인">
-      <button class="social-button kakao" data-provider="kakao" type="button"><span class="social-icon kakao-icon" aria-hidden="true">●</span> 카카오로 시작하기</button>
-      <button class="social-button naver" data-provider="naver" type="button"><span class="social-icon naver-icon" aria-hidden="true">N</span> 네이버로 시작하기</button>
-      <button class="social-button apple" data-provider="apple" type="button"><span class="social-icon apple-icon" aria-hidden="true">●</span> Apple로 계속하기</button>
+      <button class="social-button" data-provider="kakao" type="button" aria-label="카카오 로그인"><img src="/assets/login-kakao.png" alt="" /></button>
+      <button class="social-button" data-provider="naver" type="button" aria-label="네이버 로그인"><img src="/assets/login-naver.png" alt="" /></button>
+      <button class="social-button" data-provider="apple" type="button" aria-label="Apple 로그인"><img src="/assets/login-apple.png" alt="" /></button>
     </div>
-    <div class="login-note">포착팜 앱에서 사용 중인 계정으로 로그인해주세요.</div>
   </div>`;
 }
 
