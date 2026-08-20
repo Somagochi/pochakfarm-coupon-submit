@@ -4,9 +4,7 @@ const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, ""
 
 if (window.location.search) {
   const searchParams = new URLSearchParams(window.location.search);
-  const accessToken = searchParams.get("accessToken")
-    || searchParams.get("access_token")
-    || searchParams.get("token");
+  const accessToken = searchParams.get("accessToken");
 
   if (accessToken) {
     sessionStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
@@ -19,8 +17,35 @@ if (window.location.search) {
   );
 }
 
+function userFromAccessToken(accessToken) {
+  if (!accessToken) return null;
+
+  try {
+    const encodedPayload = accessToken.split(".")[1];
+    if (!encodedPayload) throw new Error("Opaque access token");
+    const normalizedPayload = encodedPayload.replace(/-/g, "+").replace(/_/g, "/");
+    const paddedPayload = normalizedPayload.padEnd(Math.ceil(normalizedPayload.length / 4) * 4, "=");
+    const payloadBytes = Uint8Array.from(atob(paddedPayload), (char) => char.charCodeAt(0));
+    const payload = JSON.parse(new TextDecoder().decode(payloadBytes));
+
+    if (payload.exp && payload.exp * 1000 <= Date.now()) {
+      sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+      return null;
+    }
+
+    return {
+      id: payload.sub || "authenticated-user",
+      nickname: payload.nickname || payload.name || payload.preferred_username || "회원",
+      provider: payload.provider || "oauth",
+    };
+  } catch {
+    return { id: "authenticated-user", nickname: "회원", provider: "oauth" };
+  }
+}
+
+const authenticatedUser = userFromAccessToken(sessionStorage.getItem(ACCESS_TOKEN_KEY));
 const state = {
-  user: JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"),
+  user: authenticatedUser || JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"),
   submitting: false,
   error: "",
   success: null,
@@ -166,6 +191,7 @@ async function submitCoupon(event) {
   } catch (error) {
     if (error?.code === "UNAUTHORIZED") {
       localStorage.removeItem(STORAGE_KEY);
+      sessionStorage.removeItem(ACCESS_TOKEN_KEY);
       state.user = null;
       showToast(error.message);
     } else {
