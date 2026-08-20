@@ -1,6 +1,6 @@
 @font-face {
-  font-family: "MBC 1961굴림";
-  src: url("/fonts/MBC1961Gulim-M.ttf") format("truetype"), local("MBC 1961굴림"), local("MBC1961Gulim"), local("MBC 1961 Gulim");
+  font-family: "Suseong Dotum";
+  src: url("/fonts/SuseongDotum.otf") format("opentype"), local("수성돋움체"), local("SuseongDotum");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -17,7 +17,7 @@
   --line: #9b6a35;
   --orange: #f7a52e;
   --red: #db5c4f;
-  font-family: "MBC 1961굴림", sans-serif;
+  font-family: "Suseong Dotum", sans-serif;
   color: var(--ink);
   background: #35b9df url("/assets/page-background.png") center/cover fixed no-repeat;
   overscroll-behavior-y: none;
