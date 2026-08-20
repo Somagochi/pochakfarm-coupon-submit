@@ -122,7 +122,7 @@ function logout() {
   state.error = "";
   localStorage.removeItem(STORAGE_KEY);
   sessionStorage.removeItem(ACCESS_TOKEN_KEY);
-  render();
+  window.location.replace("/");
 }
 
 function loginView() {

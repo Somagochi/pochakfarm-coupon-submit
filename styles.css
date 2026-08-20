@@ -1,11 +1,3 @@
-@font-face {
-  font-family: "Suseong Dotum";
-  src: url("/fonts/SuseongDotum.otf") format("opentype"), local("수성돋움체"), local("SuseongDotum");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   --cream: #fff9e7;
   --paper: #fffdf3;
@@ -17,7 +9,8 @@
   --line: #9b6a35;
   --orange: #f7a52e;
   --red: #db5c4f;
-  font-family: "Suseong Dotum", sans-serif;
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 800;
   color: var(--ink);
   background: #35b9df url("/assets/page-background.png") center/cover fixed no-repeat;
   overscroll-behavior-y: none;
@@ -105,7 +98,7 @@ h1 img { display: block; width: min(100%, 360px); height: auto; margin: 0 auto; 
 .social-button, .primary-button, .secondary-button { width: 100%; min-height: 54px; border-radius: 13px; font-weight: 800; border: 0; transition: transform .15s, filter .15s; }
 .social-button:hover, .primary-button:hover, .secondary-button:hover { filter: brightness(1.04); transform: translateY(-1px); }
 .social-button:active, .primary-button:active, .secondary-button:active { transform: translateY(3px); box-shadow: none; }
-.social-buttons { display: grid; gap: 11px; }
+.social-buttons { display: grid; gap: 5px; }
 .social-button { display: block; width: min(100%, 260px); min-height: 0; margin: 0 auto; padding: 0; overflow: hidden; background: transparent; }
 .social-button img { display: block; width: 100%; height: auto; }
 .social-button:focus-visible { outline: 4px solid rgba(73, 54, 34, .45); outline-offset: 3px; }
