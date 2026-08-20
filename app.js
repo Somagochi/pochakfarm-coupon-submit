@@ -86,9 +86,49 @@ function showToast(message) {
   window.setTimeout(() => toast.classList.remove("show"), 2200);
 }
 
+async function loadCurrentUser() {
+  const accessToken = sessionStorage.getItem(ACCESS_TOKEN_KEY);
+  if (!accessToken) return;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const body = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      const error = new Error(body?.message || "사용자 정보를 불러오지 못했습니다.");
+      error.status = response.status;
+      throw error;
+    }
+
+    const user = body?.data?.user || body?.data || body?.result?.user || body?.result || body?.user || body;
+    const nickname = user?.nickname || user?.userNickname || user?.name;
+    if (!nickname) throw new Error("사용자 닉네임을 확인할 수 없습니다.");
+
+    state.user = {
+      id: user.id || user.userId || user.sub || "authenticated-user",
+      nickname,
+      provider: user.provider || "oauth",
+    };
+    localStorage.removeItem(STORAGE_KEY);
+    render();
+  } catch (error) {
+    if (error.status === 401 || error.status === 403) {
+      logout();
+      return;
+    }
+    showToast(error.message || "사용자 정보를 불러오지 못했습니다.");
+  }
+}
+
 function renderHeader() {
   accountArea.innerHTML = state.user
-    ? `<div class="account-pill"><span class="avatar">🐣</span><span class="name">${escapeHtml(state.user.nickname)}님의 농장</span><button class="logout" type="button">로그아웃</button></div>`
+    ? `<div class="account-pill"><span class="name">${escapeHtml(state.user.nickname)}님의 농장</span><button class="logout" type="button">로그아웃</button></div>`
     : "";
   accountArea.querySelector(".logout")?.addEventListener("click", logout);
 }
@@ -214,3 +254,4 @@ function render() {
 }
 
 render();
+loadCurrentUser();

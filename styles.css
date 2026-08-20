@@ -57,7 +57,6 @@ button { cursor: pointer; }
 .brand-title { display: block; width: 126px; height: auto; }
 
 .account-pill { display: flex; align-items: center; gap: 9px; color: #42602f; font-weight: 700; font-size: 13px; }
-.account-pill .avatar { width: 34px; height: 34px; display: grid; place-items: center; background: #ffe793; border: 2px solid #9d753f; border-radius: 50%; }
 .logout { border: 0; background: transparent; color: #816d56; padding: 7px; text-decoration: underline; text-underline-offset: 3px; font-size: 12px; }
 
 .hero { width: min(100% - 32px, 510px); margin: 0 auto; padding: clamp(48px, 9vh, 86px) 0 36px; text-align: center; }
@@ -138,7 +137,7 @@ h1 img { display: block; width: min(100%, 360px); height: auto; margin: 0 auto; 
   .topbar { height: 54px; padding: 0 13px; border-bottom-width: 3px; }
   .brand-mark { width: 32px; height: 32px; border-radius: 9px; }
   .brand-title { width: 105px; }
-  .account-pill .name { display: none; }
+  .account-pill { gap: 4px; font-size: 11px; }
   .hero { padding-top: 35px; }
   .mobile-only { display: initial; }
   .card-inner { padding: 16px 10px 12px; }
