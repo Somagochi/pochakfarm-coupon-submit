@@ -1,6 +1,7 @@
 const STORAGE_KEY = "pochakfarm_coupon_session";
 const ACCESS_TOKEN_KEY = "pochakfarm_access_token";
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const API_REQUEST_BASE_URL = window.location.protocol === "https:" ? "" : API_BASE_URL;
 
 if (window.location.search) {
   const searchParams = new URLSearchParams(window.location.search);
@@ -91,7 +92,7 @@ async function loadCurrentUser() {
   if (!accessToken) return;
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+    const response = await fetch(`${API_REQUEST_BASE_URL}/api/users/me`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -134,11 +135,11 @@ function renderHeader() {
 }
 
 function startOAuthLogin(provider) {
-  if (!API_BASE_URL) {
+  if (!API_REQUEST_BASE_URL && window.location.protocol !== "https:") {
     showToast("API 서버 주소가 설정되지 않았습니다.");
     return;
   }
-  window.location.assign(`${API_BASE_URL}/api/auth/oauth2/${provider}`);
+  window.location.assign(`${API_REQUEST_BASE_URL}/api/auth/oauth2/${provider}`);
 }
 
 function login(provider) {
