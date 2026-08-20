@@ -82,13 +82,19 @@ function logout() {
 
 function loginView() {
   return `<div class="card-inner">
-    <div class="card-icon login-logo" aria-hidden="true"><img src="/assets/pochakfarm-logo.png" alt="" /></div>
-    <h2 class="card-title">먼저 로그인해주세요!</h2>
-    <p class="card-copy">쿠폰 보상을 받을<br />포착팜 계정으로 로그인해주세요.</p>
-    <div class="social-buttons" aria-label="소셜 로그인">
-      <button class="social-button" data-provider="kakao" type="button" aria-label="카카오 로그인"><img src="/assets/login-kakao.png" alt="" /></button>
-      <button class="social-button" data-provider="naver" type="button" aria-label="네이버 로그인"><img src="/assets/login-naver.png" alt="" /></button>
-      <button class="social-button" data-provider="apple" type="button" aria-label="Apple 로그인"><img src="/assets/login-apple.png" alt="" /></button>
+    <div class="login-controls">
+      <h2 class="card-title">먼저 로그인해주세요!</h2>
+      <p class="card-copy">쿠폰 보상을 받을 포착팜 계정으로 로그인해주세요.</p>
+      <div class="social-buttons" aria-label="소셜 로그인">
+        <button class="social-button" data-provider="kakao" type="button" aria-label="카카오 로그인"><img src="/assets/login-kakao.png" alt="" /></button>
+        <button class="social-button" data-provider="naver" type="button" aria-label="네이버 로그인"><img src="/assets/login-naver.png" alt="" /></button>
+        <button class="social-button" data-provider="apple" type="button" aria-label="Apple 로그인"><img src="/assets/login-apple.png" alt="" /></button>
+      </div>
+    </div>
+    <div class="reservation-rewards" aria-label="사전예약 보상">
+      <img src="/assets/reward-01.png" alt="01 S등급 캐릭터 카드 무료 획득" />
+      <img src="/assets/reward-02.png" alt="02 1기 포착단 한정 배지 증정" />
+      <img src="/assets/reward-03.png" alt="03 더 많은 포착을 위한 3,000 코인 증정" />
     </div>
   </div>`;
 }
