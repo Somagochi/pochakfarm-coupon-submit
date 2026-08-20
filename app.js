@@ -1,11 +1,15 @@
 const STORAGE_KEY = "pochakfarm_coupon_session";
 const ACCESS_TOKEN_KEY = "pochakfarm_access_token";
+const PENDING_REWARD_KEY = "pochakfarm_coupon_pending_reward";
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 const API_REQUEST_BASE_URL = window.location.protocol === "https:" ? "" : API_BASE_URL;
+const IS_COUPON_DEV_PAGE = /^\/coupon-dev\/?$/.test(window.location.pathname);
+const IS_COUPON_RESULT_PAGE = /^\/coupon-result\/?$/.test(window.location.pathname);
+const INITIAL_SEARCH_PARAMS = new URLSearchParams(window.location.search);
+const DEV_SCREEN = INITIAL_SEARCH_PARAMS.get("screen") || "registration";
 
 if (window.location.search) {
-  const searchParams = new URLSearchParams(window.location.search);
-  const accessToken = searchParams.get("accessToken");
+  const accessToken = INITIAL_SEARCH_PARAMS.get("accessToken");
 
   if (accessToken) {
     sessionStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
@@ -45,11 +49,36 @@ function userFromAccessToken(accessToken) {
 }
 
 const authenticatedUser = userFromAccessToken(sessionStorage.getItem(ACCESS_TOKEN_KEY));
+let pendingReward = null;
+try {
+  pendingReward = JSON.parse(sessionStorage.getItem(PENDING_REWARD_KEY) || "null");
+} catch {
+  sessionStorage.removeItem(PENDING_REWARD_KEY);
+}
+const devReward = {
+  couponCode: "DEV-COUPON",
+  tier: "S",
+  animalName: "테스트 동물",
+  cardImageUrl: "/assets/coupon-card-placeholder.png",
+};
+const initialDevStage = DEV_SCREEN === "confirmation" ? "confirmation" : ["card", "badge", "coin"].includes(DEV_SCREEN) ? "reward" : "registration";
+const initialDevError = DEV_SCREEN === "registration-error"
+  ? "쿠폰 등록에 실패했습니다."
+  : DEV_SCREEN === "complete-error"
+    ? "쿠폰 보상을 받지 못했습니다."
+    : "";
 const state = {
-  user: authenticatedUser || JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"),
+  user: IS_COUPON_DEV_PAGE
+    ? { id: "coupon-dev-user", nickname: "테스트" }
+    : authenticatedUser || JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"),
   submitting: false,
-  error: "",
-  success: null,
+  completing: false,
+  farmFullModalVisible: IS_COUPON_DEV_PAGE && DEV_SCREEN === "farm-full",
+  couponCode: IS_COUPON_DEV_PAGE ? "" : pendingReward?.couponCode || "",
+  error: IS_COUPON_DEV_PAGE ? initialDevError : "",
+  stage: IS_COUPON_DEV_PAGE && DEV_SCREEN === "complete-error" ? "confirmation" : IS_COUPON_DEV_PAGE ? initialDevStage : IS_COUPON_RESULT_PAGE && pendingReward ? "confirmation" : "registration",
+  reward: IS_COUPON_DEV_PAGE ? devReward : pendingReward,
+  rewardStep: ["card", "badge", "coin"].includes(DEV_SCREEN) ? DEV_SCREEN : "card",
 };
 
 const appCard = document.querySelector("#app-card");
@@ -60,25 +89,31 @@ const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, (char) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;",
 }[char]));
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-/**
- * Backend integration boundary.
- * Replace this demo body with POST /api/coupons/redeem and credentials: "include".
- * The server must identify the user from its session and award all rewards atomically.
- */
 async function redeemCoupon(couponCode) {
-  await sleep(950);
-  const code = couponCode.trim().toUpperCase();
-  const demoErrors = {
-    USED2026: { code: "ALREADY_REDEEMED", message: "이미 사용한 쿠폰입니다." },
-    EXPIRED2026: { code: "EXPIRED", message: "사용 기간이 종료된 쿠폰입니다." },
-    SESSION2026: { code: "UNAUTHORIZED", message: "로그인이 만료되었습니다. 다시 로그인해주세요." },
-    ERROR2026: { code: "SERVER_ERROR", message: "쿠폰을 등록하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요." },
-  };
-  if (demoErrors[code]) throw demoErrors[code];
-  if (code !== "FARM2026") throw { code: "INVALID_COUPON", message: "유효하지 않은 쿠폰입니다. 쿠폰 코드를 다시 확인해주세요." };
-  return { success: true, message: "쿠폰이 등록되었습니다.", rewards: [{ type: "CARROT", name: "황금 당근", amount: 10, icon: "🥕" }] };
+  const accessToken = sessionStorage.getItem(ACCESS_TOKEN_KEY);
+  const response = await fetch(`${API_REQUEST_BASE_URL}/api/coupons/redeem`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+    body: JSON.stringify({ couponCode }),
+  });
+  const body = await response.json().catch(() => null);
+
+  if (!response.ok || response.status !== 200) {
+    const message = response.ok
+      ? "쿠폰 등록에 실패했습니다."
+      : body?.message || body?.data?.message || "쿠폰 등록에 실패했습니다.";
+    const error = new Error(message);
+    error.status = response.status;
+    error.code = body?.code || body?.data?.code || null;
+    error.isApiError = true;
+    throw error;
+  }
+
+  return body?.data || body?.result || body;
 }
 
 function showToast(message) {
@@ -152,17 +187,16 @@ function login(provider) {
   state.user = { id: `demo-${provider}-user`, nickname: "포착이", provider };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.user));
   state.error = "";
-  render();
-  const providerNames = { kakao: "카카오", naver: "네이버", apple: "Apple" };
-  showToast(`${providerNames[provider]} 계정으로 로그인했어요!`);
+  window.location.assign("/coupon");
 }
 
 function logout() {
   state.user = null;
-  state.success = null;
+  state.reward = null;
   state.error = "";
   localStorage.removeItem(STORAGE_KEY);
   sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+  sessionStorage.removeItem(PENDING_REWARD_KEY);
   window.location.replace("/");
 }
 
@@ -186,57 +220,101 @@ function loginView() {
 }
 
 function couponView() {
-  return `<div class="card-inner">
-    <div class="card-icon" aria-hidden="true">🎫</div>
-    <h2 class="card-title">쿠폰을 등록해주세요!</h2>
-    <p class="card-copy">받은 쿠폰 코드를 입력하면<br />포착팜 계정으로 보상이 지급돼요.</p>
-    <form id="coupon-form" novalidate>
-      <label class="coupon-label" for="coupon-code">쿠폰 코드</label>
-      <input class="coupon-input" id="coupon-code" name="couponCode" placeholder="쿠폰 코드를 입력해주세요" autocomplete="off" autocapitalize="characters" maxlength="30" ${state.submitting ? "disabled" : ""} />
-      <div class="field-error" id="field-error">${escapeHtml(state.error)}</div>
-      <button class="primary-button" type="submit" ${state.submitting ? "disabled" : ""}>${state.submitting ? "쿠폰 확인 중..." : "쿠폰 등록하기"}</button>
-    </form>
-  </div>`;
+  const isNextEnabled = Boolean(state.couponCode.trim()) && !state.submitting;
+  return `<form class="coupon-registration-panel" id="coupon-form" novalidate>
+    <div class="coupon-registration-header">
+      <img class="coupon-registration-title" src="/assets/coupon-registration-title.png" alt="쿠폰 등록" />
+    </div>
+    <img class="coupon-usage-warning" src="/assets/coupon-policy-notice.png" alt="부당한 방법으로 쿠폰을 이용하는 경우 운영정책에 따라 계정 사용이 제한될 수 있어요" />
+    <input class="coupon-registration-input" id="coupon-code" name="couponCode" value="${escapeHtml(state.couponCode)}" placeholder="쿠폰 번호 입력" aria-label="쿠폰 번호 입력" autocomplete="off" autocapitalize="characters" maxlength="30" ${state.submitting ? "disabled" : ""} />
+    <button class="coupon-next-button" type="submit" aria-label="다음으로" ${isNextEnabled ? "" : "disabled"}>
+      <img src="/assets/coupon-next-${isNextEnabled ? "active" : "disabled"}.png" alt="" />
+    </button>
+    ${farmFullModalView()}
+    ${state.error ? `<div class="coupon-error-overlay" role="dialog" aria-modal="true"><div class="coupon-error-dialog"><p>${escapeHtml(state.error)}</p><button id="coupon-error-close" type="button">확인</button></div></div>` : ""}
+  </form>`;
 }
 
-function successView() {
-  const rewards = state.success.rewards || [];
-  return `<div class="card-inner success">
-    <span class="sparkle one">✦</span><span class="sparkle two">✦</span>
-    <div class="card-icon" aria-hidden="true">🎉</div>
-    <h2 class="card-title">쿠폰 등록 완료!</h2>
-    <p class="card-copy">보상이 포착팜 계정에 지급되었어요.</p>
-    <div class="reward-box"><div class="reward-label">획득한 보상</div>
-      ${rewards.map((reward) => `<div class="reward-item"><span class="item-icon">${escapeHtml(reward.icon || "🎁")}</span><span class="reward-name">${escapeHtml(reward.name)}<strong>× ${Number(reward.amount).toLocaleString("ko-KR")}</strong></span></div>`).join("")}
-    </div>
-    <button class="secondary-button" id="another-coupon" type="button">다른 쿠폰 등록하기</button>
-  </div>`;
+function farmFullModalView() {
+  return state.farmFullModalVisible
+    ? `<div class="coupon-farm-full-overlay" role="dialog" aria-modal="true" aria-label="농장 공간 부족 안내">
+        <div class="coupon-farm-full-dialog">
+          <img class="coupon-farm-full-frame" src="/assets/coupon-farm-full-dialog.png" alt="" />
+          <img class="coupon-farm-full-text" src="/assets/coupon-farm-full-text.png" alt="현재 농장에 공간이 없어요. 땅 타일 농장을 정리한 뒤 다시 보상을 수령해주세요" />
+          <button class="coupon-farm-full-organize" type="button" aria-label="농장 정리하러 가기"><img src="/assets/coupon-farm-full-organize.png" alt="" /></button>
+          <button class="coupon-farm-full-close" type="button" aria-label="농장 공간 부족 안내 닫기"></button>
+        </div>
+      </div>`
+    : "";
+}
+
+function errorModalView() {
+  return state.error
+    ? `<div class="coupon-error-overlay" role="dialog" aria-modal="true"><div class="coupon-error-dialog"><p>${escapeHtml(state.error)}</p><button id="coupon-error-close" type="button">확인</button></div></div>`
+    : "";
+}
+
+function confirmationView() {
+  return `<section class="coupon-confirmation-panel" aria-label="쿠폰 보상 확인">
+    <div class="coupon-registration-header"></div>
+    <img class="coupon-reward-guide" src="/assets/coupon-reward-guide.png" alt="아래 보상을 확인하고 맞다면 보상받기 버튼을 눌러주세요" />
+    <img class="coupon-reward-card" src="/assets/coupon-reward-card.png" alt="S등급 카드, 1기 포착팜 배지, 코인 3,000개" />
+    <button class="coupon-complete-button" type="button" aria-label="수령하기" ${state.completing ? "disabled" : ""}><img src="/assets/coupon-complete-button.png" alt="" /></button>
+    ${errorModalView()}
+  </section>`;
+}
+
+function rewardResultView() {
+  const step = state.rewardStep;
+  const tier = ["C", "B", "A", "S", "SS", "SSS"].includes(state.reward?.tier) ? state.reward.tier : "S";
+  const title = step === "coin" ? "코인 3,000개 획득!" : step === "badge" ? "1기 포착단 뱃지 획득!" : `${tier}등급 카드 획득!`;
+  const paws = step === "coin" ? "coupon-coin-reward-paws.png" : step === "badge" ? "coupon-badge-reward-paws.png" : "coupon-card-reward-paws.png";
+  const visual = step === "card"
+    ? `<img class="coupon-reward-creature-card" src="${escapeHtml(state.reward?.cardImageUrl || "/assets/coupon-card-placeholder.png")}" data-fallback="/assets/coupon-card-placeholder.png" alt="${tier}등급 카드" />`
+    : `<div class="coupon-reward-visual"><img class="coupon-reward-glow" src="/assets/coupon-badge-reward.png" alt="" /><img class="coupon-reward-${step}-icon" src="/assets/coupon-${step}-reward-icon.png" alt="${step === "coin" ? "코인 3,000개" : "1기 포착단 뱃지"}" /></div>`;
+
+  return `<section class="coupon-reward-result" aria-label="보상 결과">
+    ${visual}
+    <h2>${title}</h2>
+    <p>다음으로를 클릭해주세요</p>
+    <img class="coupon-reward-paws" src="/assets/${paws}" alt="보상 진행 단계" />
+    <button class="coupon-reward-next" type="button" aria-label="다음으로"><img src="/assets/coupon-reward-next-button.png" alt="" /></button>
+  </section>`;
 }
 
 async function submitCoupon(event) {
   event.preventDefault();
   if (state.submitting) return;
   const input = document.querySelector("#coupon-code");
-  const code = input.value.trim().toUpperCase();
+  const code = input.value.trim();
   if (!code) {
-    state.error = "쿠폰 코드를 입력해주세요.";
-    document.querySelector("#field-error").textContent = state.error;
-    input.focus();
+    state.error = "쿠폰 번호를 입력해주세요.";
+    render();
+    document.querySelector("#coupon-code")?.focus();
+    return;
+  }
+  if (IS_COUPON_DEV_PAGE) {
+    state.reward = { ...devReward, couponCode: code };
+    state.stage = "confirmation";
+    state.error = "";
+    render();
     return;
   }
   state.submitting = true;
   state.error = "";
   render();
   try {
-    state.success = await redeemCoupon(code);
+    const reward = await redeemCoupon(code);
+    state.reward = { ...reward, couponCode: code };
+    state.stage = "confirmation";
+    sessionStorage.setItem(PENDING_REWARD_KEY, JSON.stringify(state.reward));
+    window.history.pushState({}, "", "/coupon-result");
   } catch (error) {
-    if (error?.code === "UNAUTHORIZED") {
-      localStorage.removeItem(STORAGE_KEY);
-      sessionStorage.removeItem(ACCESS_TOKEN_KEY);
-      state.user = null;
-      showToast(error.message);
+    if (error?.status === 419) {
+      state.farmFullModalVisible = true;
+      state.error = "";
     } else {
-      state.error = error?.message || (navigator.onLine ? "쿠폰을 등록하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요." : "네트워크 연결을 확인한 후 다시 시도해주세요.");
+      state.error = error instanceof Error ? error.message : "쿠폰 등록에 실패했습니다.";
     }
   } finally {
     state.submitting = false;
@@ -244,15 +322,211 @@ async function submitCoupon(event) {
   }
 }
 
+async function completeCoupon() {
+  const accessToken = sessionStorage.getItem(ACCESS_TOKEN_KEY);
+  const response = await fetch(`${API_REQUEST_BASE_URL}/api/coupons/complete`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+    body: JSON.stringify({ couponCode: state.reward?.couponCode }),
+  });
+  const body = await response.json().catch(() => null);
+
+  if (!response.ok || response.status !== 200) {
+    const message = response.ok
+      ? "쿠폰 보상을 받지 못했습니다."
+      : body?.message || body?.data?.message || "쿠폰 보상을 받지 못했습니다.";
+    const error = new Error(message);
+    error.status = response.status;
+    error.isApiError = true;
+    throw error;
+  }
+}
+
+async function submitCompleteCoupon() {
+  if (state.completing) return;
+  if (!state.reward?.couponCode) {
+    state.error = "쿠폰 보상 정보가 올바르지 않습니다.";
+    render();
+    return;
+  }
+  if (IS_COUPON_DEV_PAGE) {
+    state.stage = "reward";
+    state.rewardStep = "card";
+    state.error = "";
+    render();
+    return;
+  }
+
+  state.completing = true;
+  state.error = "";
+  render();
+  try {
+    await completeCoupon();
+    state.stage = "reward";
+    state.rewardStep = "card";
+  } catch (error) {
+    state.error = error?.isApiError ? error.message : "쿠폰 보상을 받지 못했습니다.";
+  } finally {
+    state.completing = false;
+    render();
+  }
+}
+
+function advanceReward() {
+  if (state.rewardStep === "card") {
+    state.rewardStep = "badge";
+    render();
+    return;
+  }
+  if (state.rewardStep === "badge") {
+    state.rewardStep = "coin";
+    render();
+    return;
+  }
+
+  if (IS_COUPON_DEV_PAGE) {
+    state.reward = devReward;
+    state.couponCode = "";
+    state.stage = "registration";
+    state.rewardStep = "card";
+    window.history.replaceState({}, "", "/coupon-dev?screen=registration");
+    render();
+    return;
+  }
+
+  sessionStorage.removeItem(PENDING_REWARD_KEY);
+  state.reward = null;
+  state.couponCode = "";
+  state.stage = "registration";
+  window.history.replaceState({}, "", "/coupon");
+  render();
+}
+
+function renderDevToolbar() {
+  if (!IS_COUPON_DEV_PAGE) return;
+  let toolbar = document.querySelector("#coupon-dev-toolbar");
+  if (!toolbar) {
+    toolbar = document.createElement("nav");
+    toolbar.id = "coupon-dev-toolbar";
+    toolbar.className = "coupon-dev-toolbar";
+    toolbar.setAttribute("aria-label", "쿠폰 화면 미리보기");
+    document.body.appendChild(toolbar);
+  }
+
+  toolbar.innerHTML = [
+    ["registration", "쿠폰 입력"],
+    ["confirmation", "보상 확인"],
+    ["card", "카드 결과"],
+    ["badge", "배지 결과"],
+    ["coin", "코인 결과"],
+    ["registration-error", "등록 오류"],
+    ["farm-full", "419 농장 가득 참"],
+    ["complete-error", "완료 오류"],
+  ].map(([screen, label]) => `<button type="button" data-dev-screen="${screen}">${label}</button>`).join("");
+
+  toolbar.querySelectorAll("[data-dev-screen]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const screen = button.dataset.devScreen;
+      state.reward = devReward;
+      state.error = "";
+      state.farmFullModalVisible = false;
+      if (screen === "registration" || screen === "registration-error" || screen === "farm-full") {
+        state.stage = "registration";
+        state.couponCode = "";
+        if (screen === "registration-error") state.error = "쿠폰 등록에 실패했습니다.";
+        if (screen === "farm-full") state.farmFullModalVisible = true;
+      } else if (screen === "confirmation" || screen === "complete-error") {
+        state.stage = "confirmation";
+        if (screen === "complete-error") state.error = "쿠폰 보상을 받지 못했습니다.";
+      } else {
+        state.stage = "reward";
+        state.rewardStep = screen;
+      }
+      window.history.replaceState({}, "", `/coupon-dev?screen=${screen}`);
+      render();
+    });
+  });
+}
+
 function render() {
   renderHeader();
-  appCard.innerHTML = !state.user ? loginView() : state.success ? successView() : couponView();
+  appCard.innerHTML = !state.user
+    ? loginView()
+    : state.stage === "reward"
+      ? rewardResultView()
+      : state.stage === "confirmation"
+        ? confirmationView()
+        : couponView();
   document.querySelectorAll("[data-provider]").forEach((button) => {
     button.addEventListener("click", () => login(button.dataset.provider));
   });
   document.querySelector("#coupon-form")?.addEventListener("submit", submitCoupon);
-  document.querySelector("#another-coupon")?.addEventListener("click", () => { state.success = null; state.error = ""; render(); document.querySelector("#coupon-code")?.focus(); });
+  const couponInput = document.querySelector("#coupon-code");
+  couponInput?.addEventListener("input", () => {
+    state.couponCode = couponInput.value;
+    const nextButton = document.querySelector(".coupon-next-button");
+    const nextImage = nextButton?.querySelector("img");
+    const isEnabled = Boolean(couponInput.value.trim()) && !state.submitting;
+    if (nextButton && nextImage) {
+      nextButton.disabled = !isEnabled;
+      nextImage.src = `/assets/coupon-next-${isEnabled ? "active" : "disabled"}.png`;
+    }
+  });
+  document.querySelector("#coupon-error-close")?.addEventListener("click", () => { state.error = ""; render(); });
+  document.querySelector(".coupon-farm-full-close")?.addEventListener("click", () => { state.farmFullModalVisible = false; render(); });
+  document.querySelector(".coupon-farm-full-organize")?.addEventListener("click", () => { state.farmFullModalVisible = false; render(); });
+  document.querySelector(".coupon-complete-button")?.addEventListener("click", submitCompleteCoupon);
+  document.querySelector(".coupon-reward-next")?.addEventListener("click", advanceReward);
+  const rewardCardImage = document.querySelector(".coupon-reward-creature-card");
+  rewardCardImage?.addEventListener("error", () => { rewardCardImage.src = rewardCardImage.dataset.fallback; });
+  renderDevToolbar();
 }
 
-render();
-loadCurrentUser();
+function initialize() {
+  if (IS_COUPON_DEV_PAGE) {
+    document.body.classList.add("coupon-registration-page");
+    render();
+    return;
+  }
+
+  const isCouponPage = /^\/coupon\/?$/.test(window.location.pathname);
+  const isCouponFlowPage = isCouponPage || IS_COUPON_RESULT_PAGE;
+  const hasAccessToken = Boolean(sessionStorage.getItem(ACCESS_TOKEN_KEY));
+  const hasDemoSession = Boolean(localStorage.getItem(STORAGE_KEY));
+  const hasAuthenticatedSession = hasAccessToken || hasDemoSession;
+
+  if (isCouponFlowPage) document.body.classList.add("coupon-registration-page");
+
+  if (isCouponFlowPage && !hasAuthenticatedSession) {
+    window.location.replace("/");
+    return;
+  }
+
+  if (IS_COUPON_RESULT_PAGE && !pendingReward) {
+    window.location.replace("/coupon");
+    return;
+  }
+
+  if (!isCouponFlowPage && hasAuthenticatedSession) {
+    window.location.replace("/coupon");
+    return;
+  }
+
+  render();
+  loadCurrentUser();
+}
+
+initialize();
+
+window.addEventListener("popstate", () => {
+  if (/^\/coupon\/?$/.test(window.location.pathname)) {
+    state.stage = "registration";
+  } else if (/^\/coupon-result\/?$/.test(window.location.pathname) && state.reward) {
+    state.stage = "confirmation";
+  }
+  render();
+});

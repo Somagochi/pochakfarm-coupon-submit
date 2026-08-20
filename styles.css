@@ -1,3 +1,27 @@
+@font-face {
+  font-family: "Elice DX Neolli";
+  src: url("/fonts/EliceDXNeolli-Medium.ttf") format("truetype"), local("Elice DX Neolli Medium"), local("엘리스 DX 널리 Medium");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Elice DX Neolli";
+  src: url("/fonts/EliceDXNeolli-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard App";
+  src: url("/fonts/Pretendard-SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --cream: #fff9e7;
   --paper: #fffdf3;
@@ -75,7 +99,71 @@ h1 img { display: block; width: min(100%, 360px); height: auto; margin: 0 auto; 
   padding: 10% 5% 5%;
   background: url("/assets/bottom-sheet.png") center/100% 100% no-repeat;
 }
+.coupon-registration-page .game-card {
+  height: 650px;
+  aspect-ratio: auto;
+  padding-top: 0;
+  border-style: solid;
+  border-width: 78px 9px 32px;
+  border-image-source: url("/assets/bottom-sheet.png");
+  border-image-slice: 240 28 100 28 fill;
+  border-image-width: 78px 9px 32px;
+  border-image-repeat: stretch;
+  background: none;
+}
+.coupon-registration-page .modal-intro { display: none; }
+.coupon-registration-page .modal-content { padding-top: 0; }
+.coupon-registration-page #app-card { height: 100%; }
 .modal-content { height: 100%; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 8%; }
+.coupon-registration-panel { position: relative; width: 100%; height: 100%; margin: 0; padding-top: 10px; display: flex; flex-direction: column; align-items: center; }
+.coupon-registration-panel > .coupon-registration-header,
+.coupon-registration-panel > .coupon-usage-warning,
+.coupon-registration-panel > .coupon-registration-input { transform: translateY(50px); }
+.coupon-registration-header { position: relative; width: 100%; height: 28px; display: flex; align-items: center; justify-content: center; }
+.coupon-registration-title { display: block; width: 84px; height: 28px; object-fit: contain; }
+.coupon-usage-warning { display: block; width: 312px; height: 64px; margin-top: 42px; object-fit: contain; }
+.coupon-registration-input { width: 280px; height: 56px; margin-top: 32px; padding: 0 16px; border: 1px solid #e7dcc2; border-radius: 14px; outline: none; background: #fff; color: #332016; font-family: "Pretendard App", Pretendard, sans-serif; font-size: 14px; font-weight: 600; }
+.coupon-registration-input::placeholder { color: #aaa9a2; opacity: 1; }
+.coupon-registration-input:focus { border-color: #e7dcc2; box-shadow: none; }
+.coupon-next-button { position: absolute; left: 50%; bottom: 47px; width: 280px; height: 60px; padding: 0; border: 0; background: transparent; transform: translateX(-50%); }
+.coupon-next-button img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.coupon-next-button:disabled { cursor: default; }
+.coupon-next-button:disabled img { opacity: .45; }
+.coupon-next-button:active:not(:disabled) { opacity: .65; }
+.coupon-error-overlay { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; padding: 24px; background: rgba(0, 0, 0, .45); }
+.coupon-error-dialog { width: min(100%, 320px); padding: 24px; border-radius: 16px; background: #fff9f0; text-align: center; }
+.coupon-error-dialog p { margin: 0; color: #685a48; font-family: "Elice DX Neolli", sans-serif; font-size: 15px; font-weight: 500; line-height: 22px; }
+.coupon-error-dialog button { min-width: 96px; height: 44px; margin-top: 24px; padding: 0 20px; border: 0; border-radius: 10px; background: #365d20; color: #fff9f0; font-family: "Elice DX Neolli", sans-serif; font-size: 16px; font-weight: 700; }
+.coupon-farm-full-overlay { position: fixed; z-index: 25; inset: 0; display: grid; place-items: center; background: rgba(13, 18, 23, .68); }
+.coupon-farm-full-dialog { position: relative; width: 280px; height: 186px; }
+.coupon-farm-full-frame { display: block; width: 280px; height: 186px; }
+.coupon-farm-full-text { position: absolute; top: 30px; left: 50%; width: 195px; height: 64px; object-fit: contain; transform: translateX(-50%); }
+.coupon-farm-full-organize { position: absolute; bottom: 26px; left: 50%; width: 105.25px; height: 42px; padding: 0; border: 0; background: transparent; transform: translateX(-50%); }
+.coupon-farm-full-organize img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.coupon-farm-full-close { position: absolute; top: 13px; right: 13px; width: 32px; height: 32px; padding: 0; border: 0; background: transparent; }
+.coupon-farm-full-organize:active, .coupon-farm-full-close:active { opacity: .65; }
+.coupon-confirmation-panel { position: relative; width: 100%; height: 100%; padding-top: 10px; display: flex; flex-direction: column; align-items: center; }
+.coupon-reward-guide { display: block; width: 312px; height: 86px; margin-top: 22px; object-fit: contain; }
+.coupon-reward-card { display: block; width: 328px; height: 176px; margin-top: 26px; object-fit: contain; }
+.coupon-complete-button { position: absolute; left: 50%; bottom: 47px; width: 280px; height: 60px; padding: 0; border: 0; background: transparent; transform: translateX(-50%); }
+.coupon-complete-button img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.coupon-complete-button:disabled { cursor: default; }
+.coupon-complete-button:active:not(:disabled) { opacity: .65; }
+.coupon-reward-result { position: fixed; z-index: 30; inset: 0; overflow-y: auto; padding: 98.13px 0 24px; display: flex; flex-direction: column; align-items: center; background: rgba(13, 18, 23, .68); color: #fff; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.coupon-reward-creature-card { display: block; width: 281.5px; height: 396.56px; flex: 0 0 auto; object-fit: fill; }
+.coupon-reward-visual { position: relative; width: 281.5px; height: 396.56px; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; }
+.coupon-reward-glow { position: absolute; top: 82.75px; left: 50%; width: 242.98px; height: 242.98px; transform: translateX(-50%); object-fit: contain; }
+.coupon-reward-badge-icon { position: relative; width: 114.32px; height: 114.32px; object-fit: contain; }
+.coupon-reward-coin-icon { position: relative; width: 194.5px; height: 194.5px; object-fit: contain; }
+.coupon-reward-result h2 { margin: 24px 0 0; font-family: "Elice DX Neolli", sans-serif; font-size: 18px; font-weight: 500; line-height: 24px; }
+.coupon-reward-result p { margin: 5.5px 0 0; color: #a4a499; font-family: "Elice DX Neolli", sans-serif; font-size: 12px; font-weight: 500; line-height: 16px; }
+.coupon-reward-paws { display: block; width: 73.51px; height: 16px; margin-top: 29.5px; object-fit: contain; }
+.coupon-reward-next { width: 280px; height: 60px; margin-top: 40px; padding: 0; flex: 0 0 auto; border: 0; background: transparent; }
+.coupon-reward-next img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.coupon-reward-next:active { opacity: .65; }
+.coupon-dev-toolbar { position: fixed; z-index: 100; right: 12px; bottom: 12px; left: 12px; display: flex; justify-content: center; gap: 6px; overflow-x: auto; padding: 8px; border: 1px solid rgba(255,255,255,.24); border-radius: 12px; background: rgba(26, 29, 24, .9); box-shadow: 0 6px 24px rgba(0,0,0,.3); backdrop-filter: blur(8px); }
+.coupon-dev-toolbar button { flex: 0 0 auto; min-height: 34px; padding: 0 11px; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; background: #fff9f0; color: #493622; font-size: 12px; font-weight: 700; }
+.coupon-dev-toolbar button:active { opacity: .7; }
 #app-card { width: 100%; }
 .card-inner { padding: 20px 16px; background: transparent; border: 0; border-radius: 0; position: relative; overflow: visible; display: flex; flex-direction: column; justify-content: center; }
 .card-inner::before, .card-inner::after { content: none; }
