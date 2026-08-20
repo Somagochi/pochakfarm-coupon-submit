@@ -1,5 +1,24 @@
 const STORAGE_KEY = "pochakfarm_coupon_session";
+const ACCESS_TOKEN_KEY = "pochakfarm_access_token";
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+
+if (window.location.search) {
+  const searchParams = new URLSearchParams(window.location.search);
+  const accessToken = searchParams.get("accessToken")
+    || searchParams.get("access_token")
+    || searchParams.get("token");
+
+  if (accessToken) {
+    sessionStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+  }
+
+  window.history.replaceState(
+    window.history.state,
+    "",
+    `${window.location.pathname}${window.location.hash}`,
+  );
+}
+
 const state = {
   user: JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"),
   submitting: false,
@@ -77,6 +96,7 @@ function logout() {
   state.success = null;
   state.error = "";
   localStorage.removeItem(STORAGE_KEY);
+  sessionStorage.removeItem(ACCESS_TOKEN_KEY);
   render();
 }
 
