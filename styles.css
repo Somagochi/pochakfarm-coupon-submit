@@ -73,11 +73,12 @@ button { cursor: pointer; }
 h1 { font-family: inherit; font-size: clamp(34px, 8vw, 48px); margin: 9px 0 7px; letter-spacing: -2px; color: #fffbed; -webkit-text-stroke: 2px #4b7838; paint-order: stroke fill; text-shadow: 0 4px 0 #315f2a, 0 7px 0 rgba(43,79,27,.2); }
 h1 img { display: block; width: min(100%, 360px); height: auto; margin: 0 auto; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-.modal-intro { margin-bottom: clamp(60px, 12vw, 90px); transform: translateY(48px); }
+.modal-intro { margin-bottom: clamp(100px, 17vw, 130px); transform: translateY(48px); }
+.modal-copy { margin: 10px 0 0; color: #38512e; font-size: clamp(11px, 3vw, 14px); line-height: 1.5; white-space: nowrap; }
 
 .game-card {
   width: min(100%, 430px);
-  aspect-ratio: 1324 / 2784;
+  aspect-ratio: 1324 / 3456;
   margin: 25px auto 0;
   padding: 10% 5% 5%;
   background: url("/assets/bottom-sheet.png") center/100% 100% no-repeat;
@@ -89,7 +90,17 @@ h1 img { display: block; width: min(100%, 360px); height: auto; margin: 0 auto; 
 .card-icon { width: 66px; height: 66px; margin: 0 auto 12px; display: grid; place-items: center; font-size: 37px; background: #eaf7ce; border: 3px solid #80a853; border-radius: 18px; box-shadow: inset -5px -5px rgba(84,145,57,.13), 0 4px #ceb86d; }
 .card-title { font-family: inherit; font-size: 27px; margin: 0 0 7px; color: #4b3722; }
 .card-copy { margin: 0 auto 21px; color: var(--muted); font-size: clamp(10px, 3vw, 13px); line-height: 1.65; white-space: nowrap; }
-.login-controls { transform: translateY(-36px); }
+.login-controls {
+  width: min(100%, 310px);
+  aspect-ratio: 1120 / 1308;
+  margin: 0 auto;
+  padding: 8% 7%;
+  background: url("/assets/login-card.png") center/100% 100% no-repeat;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transform: translateY(-36px);
+}
 
 .social-button, .primary-button, .secondary-button { width: 100%; min-height: 54px; border-radius: 13px; font-weight: 800; border: 0; transition: transform .15s, filter .15s; }
 .social-button:hover, .primary-button:hover, .secondary-button:hover { filter: brightness(1.04); transform: translateY(-1px); }
@@ -99,9 +110,9 @@ h1 img { display: block; width: min(100%, 360px); height: auto; margin: 0 auto; 
 .social-button img { display: block; width: 100%; height: auto; }
 .social-button:focus-visible { outline: 4px solid rgba(73, 54, 34, .45); outline-offset: 3px; }
 .reservation-rewards { display: flex; flex-direction: column; gap: 0; width: 100%; margin-top: 12px; }
-.reservation-rewards img { display: block; width: min(55%, 195px); height: auto; }
-.reservation-rewards img:nth-child(odd) { align-self: flex-start; transform: translateX(25%); }
-.reservation-rewards img:nth-child(even) { align-self: flex-end; transform: translateX(-25%); }
+.reservation-rewards img { display: block; width: min(66%, 235px); height: auto; }
+.reservation-rewards img:nth-child(odd) { align-self: flex-start; transform: translateX(8%); }
+.reservation-rewards img:nth-child(even) { align-self: flex-end; transform: translateX(-8%); }
 .coupon-label { display: block; text-align: left; font-size: 12px; font-weight: 900; color: #6b583e; margin-bottom: 7px; }
 .coupon-input { width: 100%; height: 55px; border-radius: 12px; border: 3px solid #d9bf8c; background: #fff; color: #3f3529; padding: 0 15px; text-align: center; font-weight: 800; font-size: 16px; letter-spacing: 1px; outline: none; text-transform: uppercase; box-shadow: inset 0 3px rgba(121,89,44,.06); }
 .coupon-input::placeholder { letter-spacing: 0; font-weight: 600; color: #baa98e; text-transform: none; }
